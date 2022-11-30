@@ -1,59 +1,83 @@
+"""
+Лабораторная работа №4
+Вариант №2.
+Вводная часть: нет
+Формат ключа: XXXX-XXXX-XXXX-XXXX
+Правило генерации: Каждый блок имеет одну цифру и три буквы в случайном порядке
+"""
+import string
+
+from random import choices, sample
+
 import tkinter as tk
-from tkinter import messagebox
-from sqrEq import sqr_eq
+
+# Для отключения приветственного сообщения
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
+
+from PIL import Image, ImageTk
 
 
-def close():
-    window.destroy()
+def set_text(text):
+    """
+    Функция замена текста в поле
+    :param text: Текст
+    :return:     None
+    """
+    e.delete(0, tk.END)
+    e.insert(0, text)
 
 
-def calc():
-    A = float(arg_A.get())
-    B = float(arg_B.get())
-    C = float(arg_C.get())
-    if A == 0:
-        tk.messagebox.showerror('Error', 'Division by zero!')
-    else:
-        lbl_result.configure(text=sqr_eq(A, B, C))
+def generate_key():
+    """
+    Функция генерации ключа по заданию
+    :return: Ключ
+    """
+    # Зададим возможные варианты
+    alphabet = string.ascii_uppercase
+    digits = string.digits
+
+    # Сгенерируем ключ
+    key = "-".join(
+        [
+            "".join(sample(choices(alphabet, k=3) + choices(digits, k=1), 4))
+            for _ in range(4)
+        ]
+    )
+    return key
 
 
+# Создание главного окна
 window = tk.Tk()
-window.title('Title')
-window.geometry('360x240')
-bg = tk.PhotoImage(file='gradient.png')
+window.title("Key generator")
+window.geometry("683x384")
 
-frame = tk.Frame(window)
-frame.place(relx=0.5, rely=0.5, anchor='center')
+# Иконка приложения
+ico = Image.open("icon.ico")
+photo = ImageTk.PhotoImage(ico)
+window.wm_iconphoto(False, photo)
 
-lbl_bg = tk.Label(frame, image=bg)
-lbl_bg.place(x=0, y=0)
+# Картинка для фона
+background_image = tk.PhotoImage(file="battlefield.png")
+background_label = tk.Label(window, image=background_image)
+background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-lbl_A = tk.Label(frame, text='A', font=('Arial', 30), bg='#000099', fg='#dddddd')
-lbl_A.grid(column=0, row=0, padx=10, pady=15)
-arg_A = tk.Entry(frame, width = 10)
-arg_A.insert(0, '1')
-arg_A.grid(column=0, row=1, padx=10, pady=15)
+frame = tk.Frame(window, bg=None)
+frame.place(relx=0.5, rely=0.5, anchor="center")
 
-lbl_B = tk.Label(frame, text='B', font=('Arial', 30))
-lbl_B.grid(column=1, row=0, padx=10, pady=15)
-arg_B = tk.Entry(frame, width = 10)
-arg_B.insert(0, '0')
-arg_B.grid(column=1, row=1, padx=10, pady=15)
 
-lbl_C = tk.Label(frame, text='C', font=('Arial', 30))
-lbl_C.grid(column=2, row=0, padx=10, pady=15)
-arg_C = tk.Entry(frame, width = 10)
-arg_C.insert(0, '0')
-arg_C.grid(column=2, row=1, padx=10, pady=15)
+e = tk.Entry(frame, width=23)
+e.pack()
 
-lbl_roots = tk.Label(frame, text='Result:')
-lbl_roots.grid(column=0, row=2)
-lbl_result = tk.Label(frame, text='Enter the values.', font=('Arial', 10))
-lbl_result.grid(column=2, row=2)
+# Кнопка генерации ключа
+b1 = tk.Button(frame, width=19, text="Generate!", bg="#9cc", command=lambda: set_text(generate_key()))
+b1.pack()
 
-btn_calc = tk.Button(frame, text='Calculate', font=('Arial', 15), command=calc)
-btn_calc.grid(column=0, row=3)
-btn_exit = tk.Button(frame, text='Cancel', font=('Arial', 15), command=close)
-btn_exit.grid(column=2, row=3)
+# Запуск музыки
+pygame.init()
+pygame.mixer.music.load("sound.mp3")  # Loading File Into Mixer
+pygame.mixer.music.play()  # Playing It In The Whole Device
 
+# Вывод окна
 window.mainloop()
